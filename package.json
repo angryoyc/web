@@ -7,11 +7,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Serg A. osipov",
+  "author": "Serg A. Osipov",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "ssh://serg@settv.ru:1022/opt/git/web.git"
+  },
+  "dependencies": {
+    "rsvp": "^3.0.14"
   },
   "keywords": [
     "web",
