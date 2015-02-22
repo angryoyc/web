@@ -19,5 +19,8 @@
   "keywords": [
     "web",
     "http"
-  ]
+  ],
+  "devDependencies": {
+    "jsdoc": "^3.3.0-beta1"
+  }
 }

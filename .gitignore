@@ -1,4 +1,5 @@
 out
+help
 node_modules
 config.json
 *.log

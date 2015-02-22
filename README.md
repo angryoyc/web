@@ -14,4 +14,4 @@ Some methods for outgoing http-requests with pomises.
 Install
 --------
 
-npm install git+ssh://serg@settv.ru:1022/opt/git/web.git 
+npm install git+ssh://serg@settv.ru:1022/opt/git/web.git

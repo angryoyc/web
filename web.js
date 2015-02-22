@@ -1,22 +1,16 @@
-/**
- * *************************************************************************
- * WEB - Несколько методов, для выполнения исходящих HTTP-вызовов
- * 
- * web.get          - простой GET запрос
- * web.post         - простой GET запрос
- * web.get_json     - GET запрос, возвращающий JSON-данные
- * web.post_json    - POST запрос, возвращающий JSON-данные
- * web.get_file     - GET запрос, возвращающий файл
- * web.post_file    - POST запрос, возвращающий файл (не реализовано)
- * *************************************************************************
+/** @module web
+ * @name web
+ * @author Serg A. Osipov
+ * @email serg.osipov@gmail.com
+ * @overview Some web request methods
  */
 
-var RSVP = require('rsvp');
 var conf;
 var fs=require('fs');
 var url = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
+var RSVP = require('rsvp');
 
 /**
  * Возвращаем объект conf
@@ -28,26 +22,29 @@ function getconf(){
 };
 
 /**
- * Установка соственного объекта конфигурации
- * @param  {conf} config - Объект конфигурации
- * @return {undefined}       
- */
-exports.setconf=function setconf(config){
-	conf = config;
-	return this;
-};
-
-/**
  * Возвращает http или https - объект в зависимости от URL
  * @param  {string} url  	URL - анализируется только начала запроса, указывающая тип протокола
  * @return {http|https}     http или https объект
  */
-exports.getHttp=function(url){
+function getHttp(url){
+	//exports.getHttp=function(url){
 	if(url && url.match(/^https/i)){
 		return require('https');
 	}else if(url && url.match(/^http/i)){
 		return http=require('http');
 	};
+};
+
+
+/**
+ * Установка соственного объекта конфигурации
+ * @param  {conf} config - Объект конфигурации
+ * @return {undefined}       
+ */
+exports.setconf=function setconf(config){
+	/** Set conf manual */
+	conf = config;
+	return this;
 };
 
 /**
@@ -66,7 +63,7 @@ exports.get=function (url, headers){
 		if(url){
 			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
 				string = '';
-				http = exports.getHttp(url);
+				http = getHttp(url);
 				post_options = {
 					host: m[2],
 					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
@@ -109,7 +106,7 @@ exports.post=function (url, data, headers){
 			var string = '';
 			var m;
 			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
-				var http = exports.getHttp(url);
+				var http = getHttp(url);
 				var post_options = {
 					host: m[2],
 					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
@@ -160,7 +157,7 @@ exports.post_json=function (url, data){
 };
 
 /**
- * Выполнения POST-запроса, результат которого возвращается в виде JSON
+ * Выполнения GET-запроса, результат которого возвращается в виде JSON
  * @param  {string} URL     URL как в запросе web.post
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON
  */
@@ -179,8 +176,7 @@ exports.get_json=function (url){
 /**
  * Обращение к методу API. Обёртка вокруг web.post_json
  * @param  {string} URL     URL как в запросе web.post
- * @return {promise}        Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON
- *                          В отличии от web.post_json возвращаемый результат анализируется. Если error==0 возвращается содержимое параметра data, иначе генерируется ошибка.
+ * @return {promise} 	       Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON. В отличии от web.post_json возвращаемый результат анализируется. Если error==0 возвращается содержимое параметра data, иначе генерируется ошибка.
  */
 exports.api=function (url, data){
 	return exports.post_json(url, data || {})
@@ -198,13 +194,13 @@ exports.api=function (url, data){
  * @param  {string} fileurl		URL ресурса, который должен быть получен как файл.
  * @param  {object} headers		Объект, описывающий дополнительные параметры http-заголовка.
  * @return {promise}            Возвращается promise объект, resolve-вызов которого получит object, содержащий информацию о временном файле, содержащем скаченные данные. 
- *                              Пример:
- *                              {
- *                              	file: '/full/path/to/temp/filename',
- *                              	filename: 'filename',
- *                              	fileurl: 'http://fileurl:80/get/filename',
- *                              	size: 9999
- *                              }
+ * @example
+ * {
+ *    file: '/full/path/to/temp/filename',
+ *    filename: 'filename',
+ *    fileurl: 'http://fileurl:80/get/filename',
+ *    size: 9999
+ * }
  */
 exports.get_file=function (fileurl, headers){
 	var conf=getconf(); // получаем конфигурацию
@@ -217,7 +213,7 @@ exports.get_file=function (fileurl, headers){
 			var file = tempdir + '/file_'+tmpfile;
 			var wstream = fs.createWriteStream(file);
 			var data = {file: file, filename: filename, url: fileurl, size:0};
-			var http = exports.getHttp(fileurl);
+			var http = getHttp(fileurl);
 			http.get(fileurl, function(res) {
 				res.on('error',function(err){
 					reject(err);
