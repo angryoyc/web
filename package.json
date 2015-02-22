@@ -1,0 +1,11 @@
+{
+  "name": "web_module",
+  "version": "1.0.0",
+  "description": "Common web methods",
+  "main": "web.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Serg A. osipov",
+  "license": "ISC"
+}
