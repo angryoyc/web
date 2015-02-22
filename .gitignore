@@ -1,0 +1,9 @@
+out
+node_modules
+config.json
+*.log
+trash
+trash/*
+static/less/styles.css
+.DS_Store
+
