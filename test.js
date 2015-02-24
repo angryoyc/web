@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-web=require('./web');
+var web=require('./web');
 
 web.post_json('http://127.0.0.1:5001/notice', {})
 .then(
