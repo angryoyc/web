@@ -11,7 +11,6 @@ var url = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
 var RSVP = require('rsvp');
-var querystring = require("querystring");
 
 /**
  * Возвращаем объект conf
@@ -246,7 +245,7 @@ exports.get_file=function (fileurl, headers){
 
 
 exports.escape=function (string){
-	return querystring.escape(string);
+	return encodeURIComponent(string);
 };
 
 
