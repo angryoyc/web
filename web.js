@@ -7,7 +7,7 @@
 
 var conf;
 var fs=require('fs');
-var url = require('url');
+var urlparser = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
 var RSVP = require('rsvp');
@@ -17,7 +17,7 @@ var RSVP = require('rsvp');
  * @return {conf} conf - объект, описывающий конфигурацию приложения и задающий необходимые парметры.
  */
 function getconf(){
-	if(!conf) conf = require('../../config.json')
+	if(!conf) conf = require('../config.json')
 	return conf;
 };
 
@@ -61,13 +61,18 @@ exports.get=function (url, headers){
 	var post_req;
 	return new RSVP.Promise(function(resolve, reject){
 		if(url){
-			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
+			var m = urlparser.parse(url);
+			//-if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
+			if(m && m.hostname){
 				string = '';
 				http = getHttp(url);
 				post_options = {
-					host: m[2],
-					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
-					path: m[4],
+//					host: m[2],
+//					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
+//					path: m[4],
+					host: m.hostname,
+					port: m.port || 80,
+					path: m.path,
 					method: 'GET',
 				};
 				if(headers) post_options.headers = headers;
@@ -76,10 +81,10 @@ exports.get=function (url, headers){
 					res.on('error',function(err){reject(err);});
 					res.on('data', function (chunk) {string+=chunk.toString();});
 					res.on('end', function(){
-						if(res.complete &&  res.statusCode == 200){
+						if(res.statusCode == 200){
 							resolve(string);
 						}else{
-							reject(new Error('Request error: status' + res.statusCode));
+							reject(new Error('Request error: status ' + res.statusCode + ' | complete:' + res.complete));
 						};
 					});
 				}).on('error', function(err){reject(err);});
@@ -119,7 +124,7 @@ exports.post=function (url, data, headers){
 					res.on('error',function(err){reject(err);});
 					res.on('data', function (chunk) {string+=chunk.toString();});
 					res.on('end', function(){
-						if(res.complete &&  res.statusCode == 200){
+						if(res.statusCode == 200){
 							resolve(string);
 						}else{
 							reject(new Error('Request error: status' + res.statusCode));
@@ -208,7 +213,7 @@ exports.get_file=function (fileurl, headers){
 	return new RSVP.Promise(function(resolve, reject){
 		var tempdir = (conf.tempdir || '/tmp').replace(/\/$/,''); //
 		if(fileurl){
-			var filename = url.parse(fileurl).pathname.split('/').pop();
+			var filename = urlparser.parse(fileurl).pathname.split('/').pop();
 			var tmpfile = rndString();
 			var file = tempdir + '/file_'+tmpfile;
 			var wstream = fs.createWriteStream(file);
@@ -223,7 +228,7 @@ exports.get_file=function (fileurl, headers){
 					wstream.write(chunk);}
 				);
 				res.on('end', function(){
-					if(res.complete &&  res.statusCode == 200){
+					if(res.statusCode == 200){
 						wstream.end(); 
 						data.headers = res.headers;
 						data.elapsed = (new Date() - startat);
