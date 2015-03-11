@@ -61,8 +61,8 @@ exports.get=function (url, headers){
 	var post_req;
 	return new RSVP.Promise(function(resolve, reject){
 		if(url){
-			var m = urlparser.parse(url);
 			//-if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
+			var m = urlparser.parse(url);
 			if(m && m.hostname){
 				string = '';
 				http = getHttp(url);
@@ -110,12 +110,17 @@ exports.post=function (url, data, headers){
 		if(url){
 			var string = '';
 			var m;
-			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
+//			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
+			var m = urlparser.parse(url);
+			if(m && m.hostname){
 				var http = getHttp(url);
 				var post_options = {
-					host: m[2],
-					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
-					path: m[4],
+//					host: m[2],
+//					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
+//					path: m[4],
+					host: m.hostname,
+					port: m.port || 80,
+					path: m.path,
 					method: 'POST',
 				};
 				if(headers) post_options.headers = headers;
