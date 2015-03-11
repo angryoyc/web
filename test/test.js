@@ -5,8 +5,8 @@ var should = require('should');
 var fs = require('fs');
 
 nock('http://stroka.settv.ru').get('/api/fr/test').times(2).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
-nock('http://stroka.settv.ru').post('/api/fr/test').times(2).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 nock('http://stroka.settv.ru').get('/file').replyWithFile(200, __dirname + '/files/file');
+nock('http://stroka.settv.ru').post('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 describe('Web', function(){
 
 	describe('get', function(){
@@ -19,6 +19,21 @@ describe('Web', function(){
 				},
 				function(err){
 					console.log('RESULT', err)
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
+	describe('get_json', function(){
+		it('should return right answer', function(done){
+			web.get_json('http://stroka.settv.ru/api/fr/test')
+			.then(
+				function(result){
+					result.should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					done();
+				},
+				function(err){
 					return done(err);
 				}
 			).catch(done);
@@ -47,13 +62,30 @@ describe('Web', function(){
 	});
 
 
+	describe('post', function(){
+		it('should return right answer', function(done){
+			web.post('http://stroka.settv.ru/api/fr/test', {})
+			.then(
+				function(result){
+					eval('(' + result +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					done();
+				},
+				function(err){
+					console.log('RESULT', err)
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
+
+
 	describe('post_json', function(){
 		it('should return right answer', function(done){
 			web.post_json('http://stroka.settv.ru/api/fr/test', {})
 			.then(
 				function(result){
 					result.should.eql({ error: 0, message: 'Ok', data: { ok: true } });
-					//-result.should.eql({ error: 0, message: 'Ok', data: { ok: true } });
 					done();
 				},
 				function(err){
