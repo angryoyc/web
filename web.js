@@ -1,3 +1,4 @@
+"use strict"
 /** @module web
  * @name web
  * @author Serg A. Osipov
@@ -10,6 +11,7 @@ var fs=require('fs');
 var urlparser = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
+var http = require('http')
 var RSVP = require('rsvp');
 
 /**
