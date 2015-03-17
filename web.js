@@ -155,9 +155,11 @@ exports.post=function (url, data, headers){
  * @param  {string} data    Данные, передаваемые в теле POST-запроса (как в web.post)
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON
  */
-exports.post_json=function (url, data){
+exports.post_json=function (url, data, headers){
 	var strData = JSON.stringify(data);
-	return exports.post(url, strData, {'Content-Type': 'application/json'})
+	var hdrs=headers || {};
+	hdrs['Content-Type'] = 'application/json';
+	return exports.post(url, strData, hdrs)
 	.then(function(string){
 		try{
 			var response=JSON.parse(string);
@@ -190,8 +192,8 @@ exports.get_json=function (url){
  * @param  {string} URL     URL как в запросе web.post
  * @return {promise} 	       Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON. В отличии от web.post_json возвращаемый результат анализируется. Если error==0 возвращается содержимое параметра data, иначе генерируется ошибка.
  */
-exports.api=function (url, data){
-	return exports.post_json(url, data || {})
+exports.api=function (url, data, headers){
+	return exports.post_json(url, data || {}, headers || {})
 	.then(function(json){
 		if(json.error==0){
 			return json.data;
