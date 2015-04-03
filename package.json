@@ -5,7 +5,7 @@
   "main": "web.js",
   "private": true,
   "scripts": {
-    "test": "mocha test"
+    "test": "make test"
   },
   "author": "Serg A. Osipov",
   "license": "ISC",
