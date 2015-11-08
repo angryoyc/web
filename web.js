@@ -235,6 +235,7 @@ exports.get_file=function (fileurl, headers){
 				res.on('data', function (chunk) {
 					data.size+=chunk.length;
 					wstream.write(chunk);}
+					console.log(data.size);
 				);
 				res.on('end', function(){
 					if(res.statusCode == 200){
