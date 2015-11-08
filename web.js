@@ -216,7 +216,6 @@ exports.api=function (url, data, headers){
  *    size: 9999
  * }
  */
-var ESC = '\x1b[';
 exports.get_file=function (fileurl, headers, params){
 	var conf=getconf(); // получаем конфигурацию
 	var startat = new Date();
