@@ -236,7 +236,10 @@ exports.get_file=function (fileurl, headers, params){
 				res.on('data', function (chunk) {
 					data.size+=chunk.length;
 					wstream.write(chunk);
-					process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
+					if(params && params.onprogress && typeof(params.onprogress)=='function'){
+						params.onprogress(data);
+						//- process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
+					};
 				});
 				res.on('end', function(){
 					if(res.statusCode == 200){
