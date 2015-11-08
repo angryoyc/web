@@ -217,11 +217,11 @@ exports.api=function (url, data, headers){
  * }
  */
 var ESC = '\x1b[';
-exports.get_file=function (fileurl, headers){
+exports.get_file=function (fileurl, headers, params){
 	var conf=getconf(); // получаем конфигурацию
 	var startat = new Date();
 	return new RSVP.Promise(function(resolve, reject){
-		var tempdir = (conf.tempdir || '/tmp').replace(/\/$/,''); //
+		var tempdir = ((params?params.tempdir:'') || conf.tempdir || '/tmp').replace(/\/$/,''); //
 		if(fileurl){
 			var filename = urlparser.parse(fileurl).pathname.split('/').pop();
 			var tmpfile = rndString();
@@ -236,8 +236,7 @@ exports.get_file=function (fileurl, headers){
 				res.on('data', function (chunk) {
 					data.size+=chunk.length;
 					wstream.write(chunk);
-					//-console.log(data.size);
-					process.stdout.write('\rhttp get file: ' + ESC + '1m' + data.size + ' bytes' + ESC + '0m\r');
+					process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
 				});
 				res.on('end', function(){
 					if(res.statusCode == 200){
