@@ -243,13 +243,15 @@ exports.get_file=function (fileurl, headers){
 					if(res.statusCode == 200){
 						wstream.end(); 
 						data.headers = res.headers;
-						data.elapsed = (new Date() - startat);
-						resolve(data);
 					}else{
 						wstream.end();
 						fs.unlinkSync(file);
 						reject(new Error('Request error'));
 					};
+				});
+				wstream.on('close', function(){
+					data.elapsed = (new Date() - startat);
+					resolve(data);
 				});
 			}).on('error', function(err){
 				reject(err);
