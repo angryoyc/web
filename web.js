@@ -216,6 +216,7 @@ exports.api=function (url, data, headers){
  *    size: 9999
  * }
  */
+var ESC = '\x1b[';
 exports.get_file=function (fileurl, headers){
 	var conf=getconf(); // получаем конфигурацию
 	var startat = new Date();
@@ -235,7 +236,8 @@ exports.get_file=function (fileurl, headers){
 				res.on('data', function (chunk) {
 					data.size+=chunk.length;
 					wstream.write(chunk);
-					console.log(data.size);
+					//-console.log(data.size);
+					process.stdout.write('\rhttp get file: ' + ESC + '1m' + data.size + 'm' + ESC + '0m\r');
 				});
 				res.on('end', function(){
 					if(res.statusCode == 200){
