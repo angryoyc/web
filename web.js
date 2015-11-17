@@ -12,7 +12,7 @@ var urlparser = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
 var http = require('http')
-var RSVP = require('rsvp');
+//var RSVP = require('rsvp');
 
 /**
  * Возвращаем объект conf
@@ -61,7 +61,7 @@ exports.get=function (url, headers){
 	var http;
 	var post_options;
 	var post_req;
-	return new RSVP.Promise(function(resolve, reject){
+	return new Promise(function(resolve, reject){
 		if(url){
 			//-if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
 			var m = urlparser.parse(url);
@@ -108,7 +108,7 @@ exports.get=function (url, headers){
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в сыром виде (то есть в виде строки)
  */
 exports.post=function (url, data, headers){
-	return new RSVP.Promise(function(resolve, reject){
+	return new Promise(function(resolve, reject){
 		if(url){
 			var string = '';
 			var m;
@@ -165,7 +165,8 @@ exports.post_json=function (url, data, headers){
 			var response=JSON.parse(string);
 			return response;
 		}catch(e){
-			return RSVP.Promise.reject(e);
+			throw e;
+			//- return Promise.reject(e);
 		};
 	})
 };
@@ -182,7 +183,8 @@ exports.get_json=function (url){
 			var response=JSON.parse(string);
 			return response;
 		}catch(e){
-			return RSVP.Promise.reject(e);
+			throw e;
+			//- return RSVP.Promise.reject(e);
 		};
 	})
 };
@@ -198,7 +200,8 @@ exports.api=function (url, data, headers){
 		if(json.error==0){
 			return json.data;
 		}else{
-			return RSVP.Promise.reject(new Error(json.message));
+			throw new Error(json.message);
+			//- return RSVP.Promise.reject(new Error(json.message));
 		};
 	});
 };
@@ -219,7 +222,7 @@ exports.api=function (url, data, headers){
 exports.get_file=function (fileurl, headers, params){
 	var conf=getconf(); // получаем конфигурацию
 	var startat = new Date();
-	return new RSVP.Promise(function(resolve, reject){
+	return new Promise(function(resolve, reject){
 		var tempdir = ((params?params.tempdir:'') || conf.tempdir || '/tmp').replace(/\/$/,''); //
 		if(fileurl){
 			var filename = urlparser.parse(fileurl).pathname.split('/').pop();
