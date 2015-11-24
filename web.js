@@ -1,10 +1,11 @@
-"use strict"
 /** @module web
  * @name web
  * @author Serg A. Osipov
  * @email serg.osipov@gmail.com
  * @overview Some web request methods
  */
+
+"use strict"
 
 var conf;
 var fs=require('fs');
