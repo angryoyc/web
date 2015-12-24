@@ -20,7 +20,11 @@ var http = require('http')
  * @return {conf} conf - объект, описывающий конфигурацию приложения и задающий необходимые парметры.
  */
 function getconf(){
-	if(!conf) conf = require('../config.json')
+	try{
+		if(!conf) conf = require('../config.json');
+	}catch(e){
+		conf ={};
+	}
 	return conf;
 };
 
