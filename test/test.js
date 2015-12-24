@@ -50,8 +50,12 @@ describe('Web', function(){
 					should.exist(result);
 					result.should.type('object');
 					result.file.should.type('string');
-					fs.unlink(result.file);
 
+					if (!fs.existsSync(result.file)) {
+						throw ("Downloaded file is not exists");
+					};
+
+					fs.unlink(result.file);
 					done();
 				},
 				function(err){

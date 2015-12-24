@@ -64,8 +64,8 @@ exports.get=function (url, headers){
 	var m;
 	var string;
 	var http;
-	var post_options;
-	var post_req;
+	var get_options;
+	var get_req;
 	return new Promise(function(resolve, reject){
 		if(url){
 			//-if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
@@ -73,17 +73,14 @@ exports.get=function (url, headers){
 			if(m && m.hostname){
 				string = '';
 				http = getHttp(url);
-				post_options = {
-//					host: m[2],
-//					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
-//					path: m[4],
+				get_options = {
 					host: m.hostname,
 					port: m.port || 80,
 					path: m.path,
 					method: 'GET',
 				};
-				if(headers) post_options.headers = headers;
-				post_req = http.request(post_options, function(res) {
+				if(headers) get_options.headers = headers;
+				get_req = http.request(get_options, function(res) {
 					res.setEncoding('utf8');
 					res.on('error',function(err){reject(err);});
 					res.on('data', function (chunk) {string+=chunk.toString();});
@@ -95,7 +92,7 @@ exports.get=function (url, headers){
 						};
 					});
 				}).on('error', function(err){reject(err);});
-				post_req.end();
+				get_req.end();
 			}else{
 				reject('Invalid URL');
 			};
@@ -122,9 +119,6 @@ exports.post=function (url, data, headers){
 			if(m && m.hostname){
 				var http = getHttp(url);
 				var post_options = {
-//					host: m[2],
-//					port: m[3]?(parseInt(m[3].substr(1)) || 80):80,
-//					path: m[4],
 					host: m.hostname,
 					port: m.port || 80,
 					path: m.path,
@@ -235,6 +229,50 @@ exports.get_file=function (fileurl, headers, params){
 			var file = tempdir + '/file_'+tmpfile;
 			var wstream = fs.createWriteStream(file);
 			var data = {file: file, filename: filename, url: fileurl, size:0};
+			var m = urlparser.parse(fileurl);
+			if(m && m.hostname){
+				var string = '';
+				var http = getHttp(fileurl);
+				var get_options = {
+					host: m.hostname,
+					port: m.port || 80,
+					path: m.path,
+					method: 'GET',
+				};
+				if(headers) get_options.headers = headers;
+				var get_req = http.request(get_options, function(res) {
+					res.on('error',function(err){
+						reject(err);
+					});
+					res.on('data', function (chunk) {
+						data.size+=chunk.length;
+						wstream.write(chunk);
+						if(params && params.onprogress && typeof(params.onprogress)=='function'){
+							params.onprogress(data);
+							//- process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
+						};
+					});
+					res.on('end', function(){
+						if(res.statusCode == 200){
+							wstream.end(); 
+							data.headers = res.headers;
+						}else{
+							wstream.end();
+							fs.unlinkSync(file);
+							reject(new Error('Request error'));
+						};
+					});
+					wstream.on('close', function(){
+						data.elapsed = (new Date() - startat);
+						resolve(data);
+					});
+				}).on('error', function(err){reject(err);});
+				get_req.end();
+			}else{
+				reject('Invalid URL');
+			};
+
+/*
 			var http = getHttp(fileurl);
 			http.get(fileurl, function(res) {
 				res.on('error',function(err){
@@ -265,6 +303,8 @@ exports.get_file=function (fileurl, headers, params){
 			}).on('error', function(err){
 				reject(err);
 			});
+*/
+
 		}else{
 			reject(new Error('Empty url'));
 		};
