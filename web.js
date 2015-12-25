@@ -205,6 +205,24 @@ exports.api=function (url, data, headers){
 	});
 };
 
+
+exports.get_file_with_redirect=function (fileurl, headers, params){
+	return new Promise(function(resolve, reject){
+		exports.get_file(fileurl, headers, params)
+		.then(
+			function(result){
+				if(result.statusCode==301 || result.statusCode==302){
+					//console.log(result.headers.location);
+					exports.get_file_with_redirect(result.headers.location, headers, params).then(resolve, reject);
+				}else{
+					resolve(result);
+				};
+			},
+			reject
+		).catch(reject);
+	});
+};
+
 /**
  * Получение файла (GET-запрос)
  * @param  {string} fileurl		URL ресурса, который должен быть получен как файл.
@@ -253,7 +271,8 @@ exports.get_file=function (fileurl, headers, params){
 						};
 					});
 					res.on('end', function(){
-						if(res.statusCode == 200){
+						data.statusCode = res.statusCode;
+						if(res.statusCode == 200  || res.statusCode==302 || res.statusCode==301){
 							wstream.end(); 
 							data.headers = res.headers;
 						}else{

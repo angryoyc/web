@@ -6,6 +6,8 @@ var fs = require('fs');
 
 nock('http://stroka.settv.ru').get('/api/fr/test').times(2).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 nock('http://stroka.settv.ru').get('/file').replyWithFile(200, __dirname + '/files/file');
+nock('http://stroka.settv.ru').get('/file').reply(302, {}, {location: 'http://stroka.settv.ru/file2'});
+nock('http://stroka.settv.ru').get('/file2').replyWithFile(200, __dirname + '/files/file');
 nock('http://stroka.settv.ru').post('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 describe('Web', function(){
 
@@ -64,6 +66,30 @@ describe('Web', function(){
 			).catch(done);
 		})
 	});
+
+
+	describe('get_file_with_redirect', function(){
+		it('should return right answer', function(done){
+			web.setconf({tempdir:'/tmp'});
+			web.get_file_with_redirect('http://stroka.settv.ru/file')
+			.then(
+				function(result){
+					should.exist(result);
+					result.should.type('object');
+					result.file.should.type('string');
+					if (!fs.existsSync(result.file)) {
+						throw ("Downloaded file is not exists");
+					};
+					fs.unlink(result.file);
+					done();
+				},
+				function(err){
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
 
 
 	describe('post', function(){
