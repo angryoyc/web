@@ -213,6 +213,7 @@ exports.get_file_with_redirect=function (fileurl, headers, params){
 			function(result){
 				if(result.statusCode==301 || result.statusCode==302){
 					//console.log(result.headers.location);
+					fs.unlink(result.file);
 					exports.get_file_with_redirect(result.headers.location, headers, params).then(resolve, reject);
 				}else{
 					resolve(result);
