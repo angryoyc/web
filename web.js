@@ -259,7 +259,7 @@ exports.get_file=function (fileurl, headers, params){
 						}else{
 							wstream.end();
 							fs.unlinkSync(file);
-							reject(new Error('Request error'));
+							reject(new Error('Request error. Status code:' + res.statusCode));
 						};
 					});
 					wstream.on('close', function(){
