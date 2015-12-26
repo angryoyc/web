@@ -206,13 +206,25 @@ exports.api=function (url, data, headers){
 };
 
 
+/**
+ * Получение файла (GET-запрос, автоматически отрабатываем редирект)
+ * @param  {string} fileurl		URL ресурса, который должен быть получен как файл.
+ * @param  {object} headers		Объект, описывающий дополнительные параметры http-заголовка.
+ * @return {promise}            Возвращается promise объект, resolve-вызов которого получит object, содержащий информацию о временном файле, содержащем скаченные данные. 
+ * @example
+ * {
+ *    file: '/full/path/to/temp/filename',
+ *    filename: 'filename',
+ *    fileurl: 'http://fileurl:80/get/filename',
+ *    size: 9999
+ * }
+ */
 exports.get_file_with_redirect=function (fileurl, headers, params){
 	return new Promise(function(resolve, reject){
 		exports.get_file(fileurl, headers, params)
 		.then(
 			function(result){
 				if(result.statusCode==301 || result.statusCode==302){
-					//console.log(result.headers.location);
 					fs.unlink(result.file);
 					exports.get_file_with_redirect(result.headers.location, headers, params).then(resolve, reject);
 				}else{
