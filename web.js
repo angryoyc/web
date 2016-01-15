@@ -61,6 +61,25 @@ exports.setconf=function setconf(config){
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в сыром виде (то есть в виде строки)
  */
 exports.get=function (url, headers){
+	return new Promise(function(resolve, reject){
+		exports.xget(url, headers)
+		.then(function(result){
+			if(result.response.statusCode == 200){
+				resolve(result.body);
+			}else{
+				reject(new Error('Request error: status ' + result.response.statusCode + ' | complete:' + result.response.complete));
+			};
+		}, reject).catch(reject);
+	});
+}
+
+/**
+ * Метод реализующий  http GET запрос. Базовый метод, возвращающий сырые данные.
+ * @param  {string} url     Полный URL запроса (включая querystring-часть - часть после '?')
+ * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
+ * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в виде объекта с двумя свойствам: response (объект, возвращаемый http.request), и body, содержащие данные тела ответа
+ */
+exports.xget=function (url, headers){
 	var m;
 	var string;
 	var http;
@@ -85,11 +104,7 @@ exports.get=function (url, headers){
 					res.on('error',function(err){reject(err);});
 					res.on('data', function (chunk) {string+=chunk.toString();});
 					res.on('end', function(){
-						if(res.statusCode == 200){
-							resolve(string);
-						}else{
-							reject(new Error('Request error: status ' + res.statusCode + ' | complete:' + res.complete));
-						};
+						resolve({body:string, response: res});
 					});
 				}).on('error', function(err){reject(err);});
 				get_req.end();

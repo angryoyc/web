@@ -4,15 +4,34 @@ var web = require("../web");
 var should = require('should');
 var fs = require('fs');
 
-nock('http://stroka.settv.ru').get('/api/fr/test').times(2).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
+nock('http://stroka.settv.ru').get('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 nock('http://stroka.settv.ru').get('/file').replyWithFile(200, __dirname + '/files/file');
 nock('http://stroka.settv.ru').get('/file').reply(302, {}, {location: 'http://stroka.settv.ru/file2'});
 nock('http://stroka.settv.ru').get('/file2').replyWithFile(200, __dirname + '/files/file');
-nock('http://stroka.settv.ru').post('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
+nock('http://stroka.settv.ru').post('/api/fr/test').times(4).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 describe('Web', function(){
 
+	describe('xget', function(){
+		it('should return object with body and response', function(done){
+			web.xget('http://stroka.settv.ru/api/fr/test')
+			.then(
+				function(result){
+					result.should.be.object;
+					result.response.should.be.object;
+					result.response.statusCode.should.eql(200);
+					eval('(' + result.body +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					done();
+				},
+				function(err){
+					console.log('RESULT', err)
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
 	describe('get', function(){
-		it('should return right answer', function(done){
+		it('should return right response body', function(done){
 			web.get('http://stroka.settv.ru/api/fr/test')
 			.then(
 				function(result){
@@ -97,7 +116,10 @@ describe('Web', function(){
 			web.xpost('http://stroka.settv.ru/api/fr/test', {})
 			.then(
 				function(result){
-					eval('(' + result +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					result.should.be.object;
+					result.response.should.be.object;
+					result.response.statusCode.should.eql(200);
+					eval('(' + result.body +')').should.eql({ error: 0, message: 'Ok', data: { ok: true } });
 					done();
 				},
 				function(err){
