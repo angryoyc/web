@@ -103,7 +103,7 @@ exports.get=function (url, headers){
 };
 
 /**
- * Метод реализующий  http POST запрос. Базовый метод, возвращающий сырые данные.
+ * Метод реализующий  http POST запрос. Базовый метод, возвращающий сырые данные. Данные запроса возвращаются только если статус ответа = 200 иначе генерируется ошибка
  * @param  {string} url     Полный URL запроса (включая querystring-часть - часть после '?')
  * @param  {string} data    Данные, передаваемые в теле POST-запроса
  * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
@@ -111,10 +111,29 @@ exports.get=function (url, headers){
  */
 exports.post=function (url, data, headers){
 	return new Promise(function(resolve, reject){
+		exports.xpost(url, data, headers)
+		.then(function(result){
+			if(result.response.statusCode == 200){
+				resolve(result.body);
+			}else{
+				reject(new Error('Request error: status ' + result.response.statusCode));
+			};
+		}, reject).catch(reject);
+	});
+};
+
+/**
+ * Метод реализующий  http POST запрос. Базовый метод, возвращающий сырые данные. Данные запроса возвращаются только если статус ответа = 200 иначе генерируется ошибка
+ * @param  {string} url     Полный URL запроса (включая querystring-часть - часть после '?')
+ * @param  {string} data    Данные, передаваемые в теле POST-запроса
+ * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
+ * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в виде объекта с двум свойствами: response (объект возвращаемый методом http.request) и body - собранные данные тела ответа
+ */
+exports.xpost=function (url, data, headers){
+	return new Promise(function(resolve, reject){
 		if(url){
 			var string = '';
 			var m;
-//			if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
 			var m = urlparser.parse(url);
 			if(m && m.hostname){
 				var http = getHttp(url);
@@ -130,11 +149,7 @@ exports.post=function (url, data, headers){
 					res.on('error',function(err){reject(err);});
 					res.on('data', function (chunk) {string+=chunk.toString();});
 					res.on('end', function(){
-						if(res.statusCode == 200){
-							resolve(string);
-						}else{
-							reject(new Error('Request error: status' + res.statusCode));
-						};
+						resolve({body:string, response: res});
 					});
 				}).on('error', function(err){reject(err);});
 				post_req.write(data);

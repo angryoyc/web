@@ -92,6 +92,23 @@ describe('Web', function(){
 
 
 
+	describe('xpost', function(){
+		it('should return object', function(done){
+			web.xpost('http://stroka.settv.ru/api/fr/test', {})
+			.then(
+				function(result){
+					eval('(' + result +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					done();
+				},
+				function(err){
+					console.log('RESULT', err)
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
+
 	describe('post', function(){
 		it('should return right answer', function(done){
 			web.post('http://stroka.settv.ru/api/fr/test', {})
