@@ -23,7 +23,7 @@ make test
 
 Example
 --------
-
+```
 require("web").get('http://settv.ru/')
 .then(
 	function(result){
@@ -33,3 +33,4 @@ require("web").get('http://settv.ru/')
 		console.log('ERR:', err);
 	}
 );
+```
