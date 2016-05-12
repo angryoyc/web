@@ -13,12 +13,15 @@ Some methods for outgoing http-requests with pomises
 
 Install
 --------
-
+```
 npm install https://github.com/angryoyc/web.git
+```
 
 Tests
 ------
+```
 make test
+```
 
 
 Example
