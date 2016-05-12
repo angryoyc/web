@@ -334,39 +334,6 @@ exports.get_file=function (fileurl, headers, params){
 				reject('Invalid URL');
 			};
 
-/*
-			var http = getHttp(fileurl);
-			http.get(fileurl, function(res) {
-				res.on('error',function(err){
-					reject(err);
-				});
-				res.on('data', function (chunk) {
-					data.size+=chunk.length;
-					wstream.write(chunk);
-					if(params && params.onprogress && typeof(params.onprogress)=='function'){
-						params.onprogress(data);
-						//- process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
-					};
-				});
-				res.on('end', function(){
-					if(res.statusCode == 200){
-						wstream.end(); 
-						data.headers = res.headers;
-					}else{
-						wstream.end();
-						fs.unlinkSync(file);
-						reject(new Error('Request error'));
-					};
-				});
-				wstream.on('close', function(){
-					data.elapsed = (new Date() - startat);
-					resolve(data);
-				});
-			}).on('error', function(err){
-				reject(err);
-			});
-*/
-
 		}else{
 			reject(new Error('Empty url'));
 		};
