@@ -19,3 +19,17 @@ npm install https://github.com/angryoyc/web.git
 Tests
 ------
 make test
+
+
+Example
+--------
+
+require("web").get('http://settv.ru/')
+.then(
+	function(result){
+		console.log(result);
+	}, 
+	function(err){
+		console.log('ERR:', err);
+	}
+);
