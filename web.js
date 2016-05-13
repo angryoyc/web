@@ -12,7 +12,8 @@ var fs=require('fs');
 var urlparser = require('url');
 //var tmpfile=0;
 var crypto = require('crypto')
-var http = require('http')
+//var http = require('http')
+//var https = require('http')
 //var RSVP = require('rsvp');
 
 /**
@@ -30,23 +31,50 @@ function getconf(){
 
 /**
  * Возвращает http или https - объект в зависимости от URL
- * @param  {string} url  	URL - анализируется только начала запроса, указывающая тип протокола
- * @return {http|https}     http или https объект
+ * @param  {string} url		URL - анализируется только начала запроса, указывающая тип протокола
+ * @return {http|https}		http или https объект
  */
 function getHttp(url){
 	//exports.getHttp=function(url){
 	if(url && url.match(/^https/i)){
 		return require('https');
 	}else if(url && url.match(/^http/i)){
-		return http=require('http');
+		return require('http');
 	};
 };
 
 
 /**
+ * Return port number by protocol name
+ * @param  {string} protocol     символьное обозначение протокола как в URL. Например 'https'
+ */
+function portByProtocol(protocol){
+	if(protocol=='https:'){
+		return 443;
+	}else if(protocol=='http:'){
+		return 80;
+	}else if(protocol=='ftp:'){
+		return 21;
+	}else{
+		return 80;
+	};
+};
+
+/**
+ * Возвращает распарсенный URL (разложенный по отдельным свойствам результирующего объекта) из заданного URL
+ * @param  {string} URL     символьное URL. Полный, то есть должен начинаться с протокола. Например 'https://lenta.ru'
+ */
+function urlparsing(url){
+	var urlparsed = urlparser.parse(url);
+	urlparsed.port =  urlparsed.port || portByProtocol(urlparsed.protocol);
+	urlparsed.httpObj = getHttp(url);
+	return urlparsed;
+};
+
+/**
  * Установка соственного объекта конфигурации
  * @param  {conf} config - Объект конфигурации
- * @return {undefined}       
+ * @return {undefined}
  */
 exports.setconf=function setconf(config){
 	/** Set conf manual */
@@ -88,13 +116,13 @@ exports.xget=function (url, headers){
 	return new Promise(function(resolve, reject){
 		if(url){
 			//-if(m=url.match(/^(http\:\/\/)(.+?)(\:\d*){0,1}(\/.*)$/)){
-			var m = urlparser.parse(url);
+			var m = urlparsing(url);
 			if(m && m.hostname){
 				string = '';
-				http = getHttp(url);
+				http = m.httpObj;;
 				get_options = {
 					host: m.hostname,
-					port: m.port || 80,
+					port: m.port,
 					path: m.path,
 					method: 'GET',
 				};
@@ -116,6 +144,8 @@ exports.xget=function (url, headers){
 		};
 	});
 };
+
+
 
 /**
  * Метод реализующий  http POST запрос. Базовый метод, возвращающий сырые данные. Данные запроса возвращаются только если статус ответа = 200 иначе генерируется ошибка
@@ -148,13 +178,12 @@ exports.xpost=function (url, data, headers){
 	return new Promise(function(resolve, reject){
 		if(url){
 			var string = '';
-			var m;
-			var m = urlparser.parse(url);
+			var m = urlparsing(url);
 			if(m && m.hostname){
-				var http = getHttp(url);
+				var http = m.httpObj;
 				var post_options = {
 					host: m.hostname,
-					port: m.port || 80,
+					port: m.port,
 					path: m.path,
 					method: 'POST',
 				};
@@ -285,18 +314,18 @@ exports.get_file=function (fileurl, headers, params){
 	return new Promise(function(resolve, reject){
 		var tempdir = ((params?params.tempdir:'') || conf.tempdir || '/tmp').replace(/\/$/,''); //
 		if(fileurl){
-			var filename = urlparser.parse(fileurl).pathname.split('/').pop();
+			var m = urlparsing(fileurl);
+			var filename = m.pathname.split('/').pop();
 			var tmpfile = rndString();
 			var file = tempdir + '/file_'+tmpfile;
 			var wstream = fs.createWriteStream(file);
 			var data = {file: file, filename: filename, url: fileurl, size:0};
-			var m = urlparser.parse(fileurl);
 			if(m && m.hostname){
 				var string = '';
-				var http = getHttp(fileurl);
+				var http = m.httpObj;
 				var get_options = {
 					host: m.hostname,
-					port: m.port || 80,
+					port: m.port,
 					path: m.path,
 					method: 'GET',
 				};
