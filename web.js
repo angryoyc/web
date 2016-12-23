@@ -320,6 +320,9 @@ exports.get_file=function (fileurl, headers, params){
 			var file = tempdir + '/file_'+tmpfile;
 			var wstream = fs.createWriteStream(file);
 			var data = {file: file, filename: filename, url: fileurl, size:0};
+			var md5sum;
+			if(params && params.md5) md5sum = crypto.createHash('md5');
+
 			if(m && m.hostname){
 				var string = '';
 				var http = m.httpObj;
@@ -337,6 +340,7 @@ exports.get_file=function (fileurl, headers, params){
 					res.on('data', function (chunk) {
 						data.size+=chunk.length;
 						wstream.write(chunk);
+						if(params && params.md5) md5sum.update(chunk);
 						if(params && params.onprogress && typeof(params.onprogress)=='function'){
 							params.onprogress(data);
 							//- process.stdout.write('\rhttp file loading: ' + ESC + '1m' + data.size + ESC + '0m' + ' bytes loaded\r');
@@ -345,8 +349,9 @@ exports.get_file=function (fileurl, headers, params){
 					res.on('end', function(){
 						data.statusCode = res.statusCode;
 						if(res.statusCode == 200  || res.statusCode==302 || res.statusCode==301){
-							wstream.end(); 
+							wstream.end();
 							data.headers = res.headers;
+							if(params && params.md5) data.body_md5=md5sum.digest('hex');
 						}else{
 							wstream.end();
 							fs.unlinkSync(file);
