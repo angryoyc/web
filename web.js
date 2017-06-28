@@ -127,7 +127,10 @@ exports.xget=function (url, headers){
 					method: 'GET',
 				};
 
-				if(m.username) get_options.auth = "Basic " + new Buffer(m.username + ":" + m.password).toString("base64");
+				if(m.auth){
+					if(!get_options.headers) get_options.headers={};
+					get_options.headers["Authorization"] =  "Basic " + new Buffer(m.auth).toString("base64");
+				};
 
 				if(headers) get_options.headers = headers;
 				get_req = http.request(get_options, function(res) {
@@ -191,7 +194,10 @@ exports.xpost=function (url, data, headers){
 					method: 'POST',
 				};
 
-				if(m.username) get_options.auth = "Basic " + new Buffer(m.username + ":" + m.password).toString("base64");
+				if(m.auth){
+					if(!get_options.headers) get_options.headers = {};
+					get_options.headers["Authorization"] =  "Basic " + new Buffer(m.auth).toString("base64");
+				};
 
 				if(headers) post_options.headers = headers;
 				var post_req = http.request(post_options, function(res) {
