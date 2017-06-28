@@ -5,6 +5,7 @@ var should = require('should');
 var fs = require('fs');
 
 nock('http://stroka.settv.ru').get('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
+nock('http://admin:123@stroka.settv.ru').get('/api/fr/test').times(3).reply(200, { error: 0, message: 'Ok', data: { ok: true } });
 nock('http://stroka.settv.ru').get('/file').replyWithFile(200, __dirname + '/files/file');
 nock('http://stroka.settv.ru').get('/file').reply(302, {}, {location: 'http://stroka.settv.ru/file2'});
 nock('http://stroka.settv.ru').get('/file2').replyWithFile(200, __dirname + '/files/file');
@@ -16,8 +17,27 @@ describe('Web', function(){
 			web.xget('http://stroka.settv.ru/api/fr/test')
 			.then(
 				function(result){
-					result.should.be.object;
-					result.response.should.be.object;
+					result.should.type('object');
+					result.response.should.type('object');
+					result.response.statusCode.should.eql(200);
+					eval('(' + result.body +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
+					done();
+				},
+				function(err){
+					console.log('RESULT', err)
+					return done(err);
+				}
+			).catch(done);
+		})
+	});
+
+	describe('xget', function(){
+		it('should return object with body and response', function(done){
+			web.xget('http://admin:123@stroka.settv.ru/api/fr/test')
+			.then(
+				function(result){
+					result.should.type('object');
+					result.response.should.type('object');
 					result.response.statusCode.should.eql(200);
 					eval('(' + result.body +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });
 					done();
@@ -113,11 +133,11 @@ describe('Web', function(){
 
 	describe('xpost', function(){
 		it('should return object', function(done){
-			web.xpost('http://stroka.settv.ru/api/fr/test', {})
+			web.xpost('http://stroka.settv.ru/api/fr/test', "")
 			.then(
 				function(result){
-					result.should.be.object;
-					result.response.should.be.object;
+					result.should.type('object');
+					result.response.should.type('object');
 					result.response.statusCode.should.eql(200);
 					eval('(' + result.body +')').should.eql({ error: 0, message: 'Ok', data: { ok: true } });
 					done();
@@ -133,7 +153,7 @@ describe('Web', function(){
 
 	describe('post', function(){
 		it('should return right answer', function(done){
-			web.post('http://stroka.settv.ru/api/fr/test', {})
+			web.post('http://stroka.settv.ru/api/fr/test', "")
 			.then(
 				function(result){
 					eval('(' + result +')') .should.eql({ error: 0, message: 'Ok', data: { ok: true } });

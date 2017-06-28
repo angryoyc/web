@@ -119,13 +119,16 @@ exports.xget=function (url, headers){
 			var m = urlparsing(url);
 			if(m && m.hostname){
 				string = '';
-				http = m.httpObj;;
+				http = m.httpObj;
 				get_options = {
 					host: m.hostname,
 					port: m.port,
 					path: m.path,
 					method: 'GET',
 				};
+
+				if(m.username) get_options.auth = "Basic " + new Buffer(m.username + ":" + m.password).toString("base64");
+
 				if(headers) get_options.headers = headers;
 				get_req = http.request(get_options, function(res) {
 					res.setEncoding('utf8');
@@ -187,6 +190,9 @@ exports.xpost=function (url, data, headers){
 					path: m.path,
 					method: 'POST',
 				};
+
+				if(m.username) get_options.auth = "Basic " + new Buffer(m.username + ":" + m.password).toString("base64");
+
 				if(headers) post_options.headers = headers;
 				var post_req = http.request(post_options, function(res) {
 					res.setEncoding('utf8');
