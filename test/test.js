@@ -96,7 +96,7 @@ describe('Web', function(){
 						throw ("Downloaded file is not exists");
 					};
 
-					fs.unlink(result.file);
+					fs.unlink(result.file, (err)=>{});
 					done();
 				},
 				function(err){
@@ -119,7 +119,7 @@ describe('Web', function(){
 					if (!fs.existsSync(result.file)) {
 						throw ("Downloaded file is not exists");
 					};
-					fs.unlink(result.file);
+					fs.unlink(result.file, (err)=>{});
 					done();
 				},
 				function(err){

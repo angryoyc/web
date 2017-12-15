@@ -296,7 +296,7 @@ exports.get_file_with_redirect = async function (fileurl, headers, params){
 		.then(
 			function(result){
 				if(result.statusCode==301 || result.statusCode==302){
-					fs.unlink(result.file);
+					fs.unlink(result.file, (err)=>{});
 					exports.get_file_with_redirect(result.headers.location, headers, params).then(resolve, reject);
 				}else{
 					resolve(result);
