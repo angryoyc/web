@@ -13,8 +13,7 @@
     "type": "git",
     "url": "ssh://serg@settv.ru:1025/opt/git/web.git"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "keywords": [
     "web",
     "http"
