@@ -1,4 +1,4 @@
 #!/bin/sh
 
 git push origin master
-git push origin web_v1
+git push origin v2
