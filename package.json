@@ -11,7 +11,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "ssh://serg@settv.ru:1022/opt/git/web.git"
+    "url": "ssh://serg@settv.ru:1025/opt/git/web.git"
   },
   "dependencies": {
   },
