@@ -88,7 +88,7 @@ exports.setconf=function setconf(config){
  * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в сыром виде (то есть в виде строки)
  */
-exports.get=function (url, headers){
+exports.get = async function (url, headers){
 	return new Promise(function(resolve, reject){
 		exports.xget(url, headers)
 		.then(function(result){
@@ -107,7 +107,7 @@ exports.get=function (url, headers){
  * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в виде объекта с двумя свойствам: response (объект, возвращаемый http.request), и body, содержащие данные тела ответа
  */
-exports.xget=function (url, headers){
+exports.xget = async function (url, headers){
 	var m;
 	var string;
 	var http;
@@ -160,7 +160,7 @@ exports.xget=function (url, headers){
  * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в сыром виде (то есть в виде строки)
  */
-exports.post=function (url, data, headers){
+exports.post = async function (url, data, headers){
 	return new Promise(function(resolve, reject){
 		exports.xpost(url, data, headers)
 		.then(function(result){
@@ -180,7 +180,7 @@ exports.post=function (url, data, headers){
  * @param  {object} headers Объект, описывающий дополнительные параметры http-заголовка.
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит результат выполнения http-запроса в виде объекта с двум свойствами: response (объект возвращаемый методом http.request) и body - собранные данные тела ответа
  */
-exports.xpost=function (url, data, headers){
+exports.xpost = async function (url, data, headers){
 	return new Promise(function(resolve, reject){
 		if(url){
 			var string = '';
@@ -225,7 +225,7 @@ exports.xpost=function (url, data, headers){
  * @param  {string} data    Данные, передаваемые в теле POST-запроса (как в web.post)
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON
  */
-exports.post_json=function (url, data, headers){
+exports.post_json = async function (url, data, headers){
 	var strData = JSON.stringify(data);
 	var hdrs=headers || {};
 	hdrs['Content-Type'] = 'application/json';
@@ -246,7 +246,7 @@ exports.post_json=function (url, data, headers){
  * @param  {string} URL     URL как в запросе web.post
  * @return {promise}        Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON
  */
-exports.get_json=function (url){
+exports.get_json = async function (url){
 	return exports.get(url)
 	.then(function(string){
 		try{
@@ -264,7 +264,7 @@ exports.get_json=function (url){
  * @param  {string} URL     URL как в запросе web.post
  * @return {promise} 	       Возвращается promise объект, resolve-вызов которого получит object, который являеется результат выполнения http-запроса распарсеный как JSON. В отличии от web.post_json возвращаемый результат анализируется. Если error==0 возвращается содержимое параметра data, иначе генерируется ошибка.
  */
-exports.api=function (url, data, headers){
+exports.api = async function (url, data, headers){
 	return exports.post_json(url, data || {}, headers || {})
 	.then(function(json){
 		if(json.error==0){
@@ -290,7 +290,7 @@ exports.api=function (url, data, headers){
  *    size: 9999
  * }
  */
-exports.get_file_with_redirect=function (fileurl, headers, params){
+exports.get_file_with_redirect = async function (fileurl, headers, params){
 	return new Promise(function(resolve, reject){
 		exports.get_file(fileurl, headers, params)
 		.then(
@@ -320,7 +320,7 @@ exports.get_file_with_redirect=function (fileurl, headers, params){
  *    size: 9999
  * }
  */
-exports.get_file=function (fileurl, headers, params){
+exports.get_file = async function (fileurl, headers, params){
 	var conf=getconf(); // получаем конфигурацию
 	var startat = new Date();
 	return new Promise(function(resolve, reject){
