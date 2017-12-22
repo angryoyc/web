@@ -167,7 +167,8 @@ exports.post = async function (url, data, headers){
 			if(result.response.statusCode == 200){
 				resolve(result.body);
 			}else{
-				reject(new Error('Request error: status ' + result.response.statusCode));
+				//reject(new Error('Request error: status ' + result.response.statusCode));
+				reject(new Error('Request error: status ' + result.response.statusCode + ' reason: ' + result.body));
 			};
 		}, reject).catch(reject);
 	});
